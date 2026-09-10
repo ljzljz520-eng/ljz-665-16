@@ -10,4 +10,5 @@
 - [Implementation Plan](Implementation-Plan.md)
 - [Task List](Task-List.md)
 - [Walkthrough](Walkthrough.md)
+- [设备档案导入导出功能说明](设备档案导入导出功能说明.md)（建表/菜单脚本：[equipment.sql](equipment.sql)）
 
