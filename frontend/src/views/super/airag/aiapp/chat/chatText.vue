@@ -1,6 +1,7 @@
 <template>
   <div v-if="parsedText != ''" class="textWrap" :class="[inversion === 'user' ? 'self' : (isOnlyImage ? 'chatgpt-image' : 'chatgpt')]" ref="textRef">
     <div v-if="inversion != 'user'" :style="{ width: getIsMobile? screenWidth : 'auto' }">
+      <!-- eslint-disable-next-line vue/no-v-html -->
       <div ref="markdownBodyRef" class="markdown-body" :class="{ 'markdown-body-generate': loading }" v-html="parsedText" />
       <template v-if="showRefKnow">
         <a-divider orientation="left">引用</a-divider>
@@ -24,6 +25,7 @@
         <p>{{ errorMsg }}</p>
       </div>
     </div>
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <div v-else class="msg" v-html="parsedText" />
   </div>
   <ImageViewer v-if="amplifyImage" :imageUrl="imageUrl" @hide="pictureHide"></ImageViewer>
@@ -40,7 +42,7 @@
 <script setup lang="ts">
   import type { JeecgTag } from './jeecg-tags/types';
   import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
-  import * as lodash from 'lodash';
+  import { throttle } from 'lodash-es';
   import md5 from 'crypto-js/md5';
   import MarkdownIt from 'markdown-it';
   import mdKatex from '@traptitech/markdown-it-katex';
@@ -62,7 +64,17 @@
   const { domainUrl } = useGlobSetting();
   const { getIsMobile } = useAppInject();
 
-  const props = defineProps(['dateTime', 'text', 'inversion', 'error', 'errorMsg', 'currentToolTag', 'loading', 'referenceKnowledge', 'isLast']);
+  const props = defineProps({
+    dateTime: { type: [String, Number], default: '' },
+    text: { type: String, default: '' },
+    inversion: { type: String, default: '' },
+    error: { type: Boolean, default: false },
+    errorMsg: { type: String, default: '' },
+    currentToolTag: { type: String, default: '' },
+    loading: { type: Boolean, default: false },
+    referenceKnowledge: { type: Array, default: () => [] },
+    isLast: { type: Boolean, default: false },
+  });
   const textRef = ref();
   const markdownBodyRef = ref<HTMLDivElement>();
 
@@ -103,7 +115,7 @@
   /**
    * 处理聊天文本并在一定时间内节流更新
    */
-  const updateTextContent = lodash.throttle(() => {
+  const updateTextContent = throttle(() => {
     let value = props.text ?? '';
     if (props.inversion !== 'user') {
       // 先替换图片宽度与域名占位符后再渲染 markdown
