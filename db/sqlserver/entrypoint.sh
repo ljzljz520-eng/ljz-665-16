@@ -42,6 +42,12 @@ echo "Ensuring database ${MSSQL_DB} exists..."
 echo "Converting JeecgBoot MySQL schema to SQL Server..."
 python3 /work/convert_mysql_to_sqlserver.py /work/jeecgboot-mysql-5.7.sql > /tmp/jeecgboot-sqlserver.sql
 
+# 追加设备档案模块（表 + 菜单）初始化脚本并一并转换
+if [[ -f /work/equipment_init_append.sql ]]; then
+  echo "Appending equipment module schema..."
+  python3 /work/convert_mysql_to_sqlserver.py /work/equipment_init_append.sql >> /tmp/jeecgboot-sqlserver.sql
+fi
+
 echo "Applying schema to ${MSSQL_DB}... (this may take a few minutes)"
 "${SQLCMD_BIN}" -S "${MSSQL_HOST},${MSSQL_PORT}" -U "${MSSQL_USER}" -P "${MSSQL_PASSWORD}" -C -d "${MSSQL_DB}" -b -f 65001 -i /tmp/jeecgboot-sqlserver.sql
 

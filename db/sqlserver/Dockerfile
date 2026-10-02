@@ -11,6 +11,7 @@ RUN apt-get update \
 COPY db/sqlserver/entrypoint.sh ./entrypoint.sh
 COPY db/sqlserver/convert_mysql_to_sqlserver.py ./convert_mysql_to_sqlserver.py
 COPY backend/db/jeecgboot-mysql-5.7.sql ./jeecgboot-mysql-5.7.sql
+COPY backend/db/equipment/equipment_init_append.sql ./equipment_init_append.sql
 
 RUN chmod +x /work/entrypoint.sh
 
